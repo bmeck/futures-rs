@@ -185,6 +185,12 @@ pub trait Stream {
     /// If this is difficult to guard against then the `fuse` adapter can be
     /// used to ensure that `poll` always has well-defined semantics.
     // TODO: more here
+    //
+    /// # Implementation Concerns
+    ///
+    /// If an implementation returns `Async`::NotReady`, it should use
+    /// `task::park()` to obtain a `Task` to `unpark` when `poll` may be
+    /// able to return `Async::Ready`.
     fn poll(&mut self) -> Poll<Option<Self::Item>, Self::Error>;
 
     // TODO: should there also be a method like `poll` but doesn't return an

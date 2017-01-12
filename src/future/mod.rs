@@ -243,6 +243,12 @@ pub trait Future {
     /// This future may have failed to finish the computation, in which case
     /// the `Err` variant will be returned with an appropriate payload of an
     /// error.
+    ///
+    /// # Implementation Concerns
+    ///
+    /// If an implementation returns `Async`::NotReady`, it should use
+    /// `task::park()` to obtain a `Task` to `unpark` when `poll` may be
+    /// able to return `Async::Ready`.
     fn poll(&mut self) -> Poll<Self::Item, Self::Error>;
 
     /// Block the current thread until this future is resolved.

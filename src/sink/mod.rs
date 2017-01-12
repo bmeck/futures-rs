@@ -142,6 +142,12 @@ pub trait Sink {
     /// - It is called outside of the context of a task.
     /// - A previous call to `start_send` or `poll_complete` yielded a permanent
     /// error.
+    ///
+    /// # Implementation Concerns
+    ///
+    /// If an implementation returns `AsyncSink::NotReady`, it should use
+    /// `task::park()` to obtain a `Task` to `unpark` when `start_send` may be
+    /// able to return `AsyncSink::Ready`.
     fn start_send(&mut self, item: Self::SinkItem)
                   -> StartSend<Self::SinkItem, Self::SinkError>;
 
@@ -178,6 +184,12 @@ pub trait Sink {
     /// - It is called outside of the context of a task.
     /// - A previous call to `start_send` or `poll_complete` yielded a permanent
     /// error.
+    ///
+    /// # Implementation Concerns
+    ///
+    /// If an implementation returns `Async::NotReady`, it should use
+    /// `task::park()` to obtain a `Task` to `unpark` when `poll_complete` may be
+    /// able to return `Async::Ready`.
     fn poll_complete(&mut self) -> Poll<(), Self::SinkError>;
 
     /// Composes a function *in front of* the sink.
